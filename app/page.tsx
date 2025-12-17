@@ -1,3 +1,6 @@
+'use client'
+
+import { useMemo } from "react"
 import { CoffeeHeader } from "@/components/coffee-header"
 import { CoffeeHero } from "@/components/coffee-hero"
 import { CoffeeProducts } from "@/components/coffee-products"
@@ -9,18 +12,27 @@ import { CoffeeFooter } from "@/components/coffee-footer"
 import { PromotionalBanner } from "@/components/promotional-banner"
 
 export default function Home() {
-  const eventDate = new Date()
-  eventDate.setDate(eventDate.getDate() + 7)
+  /**
+   * useMemo untuk mencegah hydration mismatch
+   * karena Date() bersifat non-deterministic antara server & client
+   */
+  const eventDate = useMemo(() => {
+    const date = new Date()
+    date.setDate(date.getDate() + 7)
+    return date
+  }, [])
 
   return (
     <div className="min-h-screen bg-background">
       <PromotionalBanner
-        message="Grand Opening Sale! Get 25% off on all coffee beans"
+        message="Grand Opening Week! Get 25% off on all orders over Rp 100,000"
         eventDate={eventDate}
         autoHideAfter={300}
         backgroundColor="bg-accent"
       />
+
       <CoffeeHeader />
+
       <main>
         <CoffeeHero />
         <CoffeeProducts />
@@ -29,8 +41,8 @@ export default function Home() {
         <CoffeeSubscription />
         <CoffeeCta />
       </main>
+
       <CoffeeFooter />
     </div>
   )
 }
-  

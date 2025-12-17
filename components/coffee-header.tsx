@@ -1,13 +1,26 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Menu } from "lucide-react"
+import { Menu, LogOut, ShoppingBag } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { CartSheet } from "@/components/cart-sheet"
 import { useState } from "react"
+import { useAuth } from "@/lib/auth-context"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { getUserInitials } from "@/lib/auth"
+import Link from "next/link"
 
 export function CoffeeHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { user, isAuthenticated, logout } = useAuth()
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
@@ -58,12 +71,46 @@ export function CoffeeHeader() {
 
         <div className="flex items-center gap-3">
           <CartSheet />
-          <Button
-            onClick={() => scrollToSection("shop")}
-            className="hidden sm:inline-flex bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            Shop Now
-          </Button>
+          {isAuthenticated && user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                  <Avatar className="h-9 w-9">
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      {getUserInitials(user.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium">{user.name}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => scrollToSection("shop")}>
+                  <ShoppingBag className="mr-2 h-4 w-4" />
+                  <span>Shop</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Link href="/login" className="md:inline-flex">
+                <Button variant="ghost">Sign In</Button>
+              </Link>
+              <Link href="/register" className="md:inline-flex">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Sign Up</Button>
+              </Link>
+            </>
+          )}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
@@ -72,6 +119,32 @@ export function CoffeeHeader() {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <nav className="flex flex-col gap-4 mt-8">
+                {isAuthenticated && user ? (
+                  <>
+                    <div className="flex items-center gap-3 pb-4 border-b">
+                      <Avatar className="h-12 w-12">
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          {getUserInitials(user.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <p className="text-sm font-medium">{user.name}</p>
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col gap-2 pb-4 border-b">
+                    <Link href="/login" className="w-full">
+                      <Button variant="outline" className="w-full bg-transparent">
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link href="/register" className="w-full">
+                      <Button className="w-full">Sign Up</Button>
+                    </Link>
+                  </div>
+                )}
                 <button
                   onClick={() => scrollToSection("shop")}
                   className="text-lg font-medium text-foreground/80 hover:text-foreground transition-colors text-left"
@@ -96,9 +169,12 @@ export function CoffeeHeader() {
                 >
                   Contact
                 </button>
-                <Button onClick={() => scrollToSection("shop")} className="mt-4 w-full">
-                  Shop Now
-                </Button>
+                {isAuthenticated && (
+                  <Button onClick={logout} variant="destructive" className="mt-4 w-full">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log Out
+                  </Button>
+                )}
               </nav>
             </SheetContent>
           </Sheet>

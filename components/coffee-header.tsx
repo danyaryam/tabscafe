@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Menu, LogOut, ShoppingBag } from "lucide-react"
+import { Menu, LogOut, ShoppingBag, Shield } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { CartSheet } from "@/components/cart-sheet"
 import { useState } from "react"
@@ -16,11 +16,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { getUserInitials } from "@/lib/auth"
+import { isAdminLoggedIn } from "@/lib/admin-auth"
 import Link from "next/link"
 
 export function CoffeeHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user, isAuthenticated, logout } = useAuth()
+  const isAdmin = isAdminLoggedIn()
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
@@ -94,6 +96,17 @@ export function CoffeeHeader() {
                   <ShoppingBag className="mr-2 h-4 w-4" />
                   <span>Shop</span>
                 </DropdownMenuItem>
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <Link href="/admin/dashboard">
+                      <DropdownMenuItem>
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Admin Dashboard</span>
+                      </DropdownMenuItem>
+                    </Link>
+                  </>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout}>
                   <LogOut className="mr-2 h-4 w-4" />
@@ -169,6 +182,14 @@ export function CoffeeHeader() {
                 >
                   Contact
                 </button>
+                {isAdmin && (
+                  <Link href="/admin/dashboard" className="w-full">
+                    <Button variant="outline" className="w-full justify-start bg-transparent">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Admin Dashboard
+                    </Button>
+                  </Link>
+                )}
                 {isAuthenticated && (
                   <Button onClick={logout} variant="destructive" className="mt-4 w-full">
                     <LogOut className="mr-2 h-4 w-4" />

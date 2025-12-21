@@ -3,6 +3,7 @@ import { Geist } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Providers } from "./providers"
 import "./globals.css"
+import { ScrollToTop } from "@/components/scroll-to-top"
 
 const geist = Geist({ subsets: ["latin"] })
 
@@ -19,6 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geist.className} antialiased`}>
         <Providers>{children}</Providers>
+        <ScrollToTop />
         <Analytics />
       </body>
     </html>

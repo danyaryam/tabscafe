@@ -1,6 +1,7 @@
 // Authentication utilities for Cafe Tabs
 // This is a simple localStorage-based auth system
 // Can be easily upgraded to use a real database (Supabase, Neon, etc.)
+"use client"
 
 export interface User {
   id: string

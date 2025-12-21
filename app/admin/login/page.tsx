@@ -12,7 +12,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Coffee, Lock, User } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
-// Static admin credentials
 const ADMIN_EMAIL = "tabscoff@gmail.com"
 const ADMIN_PASSWORD = "admincoff123"
 

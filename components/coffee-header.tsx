@@ -5,7 +5,6 @@ import { Menu, LogOut, ShoppingBag, Shield } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { CartSheet } from "@/components/cart-sheet"
 import { useState } from "react"
-import { useAuth } from "@/lib/auth-context"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,13 +15,20 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { getUserInitials } from "@/lib/auth"
-import { isAdminLoggedIn } from "@/lib/admin-auth"
 import Link from "next/link"
+import { useSession, signOut } from "next-auth/react"
 
 export function CoffeeHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { user, isAuthenticated, logout } = useAuth()
-  const isAdmin = isAdminLoggedIn()
+  const { data: session, status } = useSession()
+
+  const user = session?.user
+  const isAuthenticated = status === "authenticated"
+  const isAdmin = session?.user?.role === "admin"
+
+  const handleLogout = () => {
+    signOut({ callbackUrl: "/" })
+  }
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
@@ -40,7 +46,9 @@ export function CoffeeHeader() {
             <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center font-bold text-accent-foreground text-sm">
               CT
             </div>
-            <span className="text-xl font-serif font-semibold tracking-tight">Cafe Tabs</span>
+            <Link href="/" className="hidden sm:inline-block">
+              <span className="text-xl font-serif font-semibold tracking-tight">Cafe Tabs</span>
+            </Link>
           </button>
         </div>
 
@@ -69,6 +77,12 @@ export function CoffeeHeader() {
           >
             Contact
           </button>
+          <Link
+            href="/about"
+            className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
+          >
+            About
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -79,11 +93,12 @@ export function CoffeeHeader() {
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                   <Avatar className="h-9 w-9">
                     <AvatarFallback className="bg-primary text-primary-foreground">
-                      {getUserInitials(user.name)}
+                      {getUserInitials(user.name ?? "User")}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
+
               <DropdownMenuContent className="w-56" align="end">
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
@@ -91,11 +106,14 @@ export function CoffeeHeader() {
                     <p className="text-xs text-muted-foreground">{user.email}</p>
                   </div>
                 </DropdownMenuLabel>
+
                 <DropdownMenuSeparator />
+
                 <DropdownMenuItem onClick={() => scrollToSection("shop")}>
                   <ShoppingBag className="mr-2 h-4 w-4" />
                   <span>Shop</span>
                 </DropdownMenuItem>
+
                 {isAdmin && (
                   <>
                     <DropdownMenuSeparator />
@@ -107,8 +125,10 @@ export function CoffeeHeader() {
                     </Link>
                   </>
                 )}
+
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout}>
+
+                <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>
@@ -120,10 +140,13 @@ export function CoffeeHeader() {
                 <Button variant="ghost">Sign In</Button>
               </Link>
               <Link href="/register" className="md:inline-flex">
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Sign Up</Button>
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+                  Sign Up
+                </Button>
               </Link>
             </>
           )}
+
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
@@ -183,19 +206,28 @@ export function CoffeeHeader() {
                   Contact
                 </button>
                 {isAdmin && (
-                  <Link href="/admin/dashboard" className="w-full">
-                    <Button variant="outline" className="w-full justify-start bg-transparent">
-                      <Shield className="mr-2 h-4 w-4" />
-                      Admin Dashboard
-                    </Button>
-                  </Link>
-                )}
-                {isAuthenticated && (
-                  <Button onClick={logout} variant="destructive" className="mt-4 w-full">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Log Out
-                  </Button>
-                )}
+  <Link href="/admin/dashboard" className="w-full">
+    <Button
+      variant="outline"
+      className="w-full justify-start bg-transparent"
+    >
+      <Shield className="mr-2 h-4 w-4" />
+      Admin Dashboard
+    </Button>
+  </Link>
+)}
+
+{isAuthenticated && (
+  <Button
+    onClick={() => signOut({ callbackUrl: "/" })}
+    variant="destructive"
+    className="mt-4 w-full"
+  >
+    <LogOut className="mr-2 h-4 w-4" />
+    Log Out
+  </Button>
+)}
+
               </nav>
             </SheetContent>
           </Sheet>

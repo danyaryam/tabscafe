@@ -36,7 +36,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Side - Login Form */}
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center lg:hidden mb-8">

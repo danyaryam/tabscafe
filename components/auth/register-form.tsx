@@ -67,25 +67,10 @@ const handleSubmit = async (e: React.FormEvent) => {
       })
       return
     }
-  
-    const login = await signIn("credentials", {
-      email: formData.email,
-      password: formData.password,
-      redirect: false,
-    })
-
-    if (login?.error) {
-      toast({
-        title: "Login failed",
-        description: "Account created, but login failed",
-        variant: "destructive",
-      })
-      return
-    }
-
+    
     toast({
       title: "Account created!",
-      description: "Welcome to Cafe Tabs ☕",
+      description: "Please check your email to verify your account before logging in.",
     })
 
     router.push("/")

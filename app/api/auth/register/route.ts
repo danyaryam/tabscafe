@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
+import crypto from "crypto"
 import { pool } from "@/lib/db"
+import { sendVerifyEmail } from "@/lib/mail"
 
 export async function POST(req: Request) {
   const { name, email, password } = await req.json()
@@ -25,13 +27,16 @@ export async function POST(req: Request) {
   }
 
   const hashed = await bcrypt.hash(password, 10)
+  const token = crypto.randomBytes(32).toString("hex")
 
   const result = await pool.query(
-    `INSERT INTO users (name, email, password)
-     VALUES ($1, $2, $3)
+    `INSERT INTO users (name, email, password, email_verified, email_verify_token, email_verify_expires)
+     VALUES ($1, $2, $3, false, $4, NOW() + INTERVAL '1 day')
      RETURNING id, name, email`,
-    [name, email, hashed]
+    [name, email, hashed, token]
   )
+
+  await sendVerifyEmail(email, token)
 
   return NextResponse.json({ user: result.rows[0] }, { status: 201 })
 }

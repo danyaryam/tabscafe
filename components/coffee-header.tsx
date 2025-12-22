@@ -160,7 +160,7 @@ export function CoffeeHeader() {
                     <div className="flex items-center gap-3 pb-4 border-b">
                       <Avatar className="h-12 w-12">
                         <AvatarFallback className="bg-primary text-primary-foreground">
-                          {getUserInitials(user.name)}
+                          {getUserInitials(user.name ?? "User")}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col">

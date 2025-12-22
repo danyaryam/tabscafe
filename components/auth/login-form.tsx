@@ -24,53 +24,31 @@ export function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Get users from localStorage
-      const users = JSON.parse(localStorage.getItem("cafe_tabs_users") || "[]")
-      const user = users.find((u: any) => u.email === formData.email && u.password === formData.password)
-
-      if (user) {
-        // Store session
-        localStorage.setItem(
-          "cafe_tabs_session",
-          JSON.stringify({
-            user: {
-              id: user.id,
-              name: user.name,
-              email: user.email,
-            },
-            loggedIn: true,
-          }),
-        )
-
-        toast({
-          title: "Welcome back!",
-          description: "You've successfully signed in.",
-        })
-
-        router.push("/")
-        router.refresh()
-      } else {
-        toast({
-          title: "Invalid credentials",
-          description: "Please check your email and password.",
-          variant: "destructive",
-        })
-      }
-    } catch (error) {
+  
+    const res = await signIn("credentials", {
+      email: formData.email,
+      password: formData.password,
+      redirect: false,
+    })
+  
+    if (res?.error) {
       toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
+        title: "Invalid credentials",
+        description: "Please check your email and password.",
         variant: "destructive",
       })
-    } finally {
-      setIsLoading(false)
+    } else {
+      toast({
+        title: "Welcome back!",
+        description: "You've successfully signed in.",
+      })
+      router.push("/")
+      router.refresh()
     }
+  
+    setIsLoading(false)
   }
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

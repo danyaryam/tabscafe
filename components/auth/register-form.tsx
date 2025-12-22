@@ -23,93 +23,83 @@ export function RegisterForm() {
     confirmPassword: "",
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setIsLoading(true)
 
-    try {
-      // Validate passwords match
-      if (formData.password !== formData.confirmPassword) {
-        toast({
-          title: "Passwords don't match",
-          description: "Please make sure your passwords match.",
-          variant: "destructive",
-        })
-        setIsLoading(false)
-        return
-      }
+  if (formData.password !== formData.confirmPassword) {
+    toast({
+      title: "Passwords don't match",
+      variant: "destructive",
+    })
+    setIsLoading(false)
+    return
+  }
 
-      // Validate password strength
-      if (formData.password.length < 6) {
-        toast({
-          title: "Password too short",
-          description: "Password must be at least 6 characters long.",
-          variant: "destructive",
-        })
-        setIsLoading(false)
-        return
-      }
+  if (formData.password.length < 6) {
+    toast({
+      title: "Password too short",
+      description: "Minimum 6 characters",
+      variant: "destructive",
+    })
+    setIsLoading(false)
+    return
+  }
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Get existing users
-      const users = JSON.parse(localStorage.getItem("cafe_tabs_users") || "[]")
-
-      // Check if user already exists
-      if (users.some((u: any) => u.email === formData.email)) {
-        toast({
-          title: "Email already exists",
-          description: "This email is already registered. Please sign in instead.",
-          variant: "destructive",
-        })
-        setIsLoading(false)
-        return
-      }
-
-      // Create new user
-      const newUser = {
-        id: Date.now().toString(),
+  try {
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        createdAt: new Date().toISOString(),
-      }
+      }),
+    })
 
-      // Save to localStorage
-      users.push(newUser)
-      localStorage.setItem("cafe_tabs_users", JSON.stringify(users))
+    const data = await res.json()
 
-      // Create session
-      localStorage.setItem(
-        "cafe_tabs_session",
-        JSON.stringify({
-          user: {
-            id: newUser.id,
-            name: newUser.name,
-            email: newUser.email,
-          },
-          loggedIn: true,
-        }),
-      )
-
+    if (!res.ok) {
       toast({
-        title: "Account created!",
-        description: "Welcome to Cafe Tabs. You're now signed in.",
-      })
-
-      router.push("/")
-      router.refresh()
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
+        title: "Register failed",
+        description: data.message,
         variant: "destructive",
       })
-    } finally {
-      setIsLoading(false)
+      return
     }
+  
+    const login = await signIn("credentials", {
+      email: formData.email,
+      password: formData.password,
+      redirect: false,
+    })
+
+    if (login?.error) {
+      toast({
+        title: "Login failed",
+        description: "Account created, but login failed",
+        variant: "destructive",
+      })
+      return
+    }
+
+    toast({
+      title: "Account created!",
+      description: "Welcome to Cafe Tabs ☕",
+    })
+
+    router.push("/")
+    router.refresh()
+  } catch {
+    toast({
+      title: "Error",
+      description: "Server error",
+      variant: "destructive",
+    })
+  } finally {
+    setIsLoading(false)
   }
+}
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

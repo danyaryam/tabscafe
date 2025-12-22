@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Menu, LogOut, ShoppingBag, Shield } from "lucide-react"
+import { Menu, LogOut, ShoppingBag, Shield, User } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { CartSheet } from "@/components/cart-sheet"
 import { useState } from "react"
@@ -108,12 +108,18 @@ export function CoffeeHeader() {
                 </DropdownMenuLabel>
 
                 <DropdownMenuSeparator />
-
-                <DropdownMenuItem onClick={() => scrollToSection("shop")}>
-                  <ShoppingBag className="mr-2 h-4 w-4" />
-                  <span>Shop</span>
-                </DropdownMenuItem>
-
+                <Link href="/profile">
+                  <DropdownMenuItem>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>My Profile</span>
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/products">
+                  <DropdownMenuItem>
+                    <ShoppingBag className="mr-2 h-4 w-4" />
+                    <span>Shop</span>
+                  </DropdownMenuItem>
+                </Link>
                 {isAdmin && (
                   <>
                     <DropdownMenuSeparator />
@@ -160,7 +166,7 @@ export function CoffeeHeader() {
                     <div className="flex items-center gap-3 pb-4 border-b">
                       <Avatar className="h-12 w-12">
                         <AvatarFallback className="bg-primary text-primary-foreground">
-                          {getUserInitials(user.name ?? "User")}
+                          {getUserInitials(user.name)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col">

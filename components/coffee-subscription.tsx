@@ -69,7 +69,7 @@ export function CoffeeSubscription() {
           {plans.map((plan) => (
             <Card
               key={plan.name}
-              className={`relative border-border ${plan.popular ? "ring-2 ring-accent shadow-xl scale-105" : ""}`}
+              className={`relative py-6 border-border ${plan.popular ? "ring-2 ring-accent shadow-xl scale-105" : ""}`}
             >
               {plan.popular && (
                 <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground">

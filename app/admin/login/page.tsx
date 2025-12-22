@@ -68,7 +68,7 @@ export default function AdminLoginPage() {
           <p className="text-neutral-400">Sign in to access the admin dashboard</p>
         </div>
 
-        <Card className="border-neutral-700 bg-neutral-800/50 backdrop-blur">
+        <Card className="border-neutral-700 bg-neutral-800/50 backdrop-blur py-6">
           <CardHeader>
             <CardTitle className="text-white">Admin Login</CardTitle>
             <CardDescription className="text-neutral-400">Enter your credentials to continue</CardDescription>

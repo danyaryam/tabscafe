@@ -3,15 +3,9 @@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight } from "lucide-react"
+import Link from 'next/link';
 
 export function CoffeeHero() {
-  const scrollToShop = () => {
-    const element = document.getElementById("shop")
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" })
-    }
-  }
-
   const scrollToStory = () => {
     const element = document.getElementById("story")
     if (element) {
@@ -35,14 +29,15 @@ export function CoffeeHero() {
               blends delivered to your doorstep or ready for pickup.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                onClick={scrollToShop}
-                size="lg"
-                className="bg-accent text-accent-foreground hover:bg-accent/90 text-base"
-              >
-                Explore Our Coffee
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <Link href="/products">
+                <Button
+                  size="lg"
+                  className="bg-accent text-accent-foreground hover:bg-accent/90 text-base"
+                >
+                  Explore Our Coffee
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
               <Button onClick={scrollToStory} size="lg" variant="outline" className="text-base bg-transparent">
                 Learn Our Process
               </Button>

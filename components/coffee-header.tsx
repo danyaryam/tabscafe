@@ -17,8 +17,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { getUserInitials } from "@/lib/auth"
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
+import { usePathname } from "next/navigation"
 
 export function CoffeeHeader() {
+  const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { data: session, status } = useSession()
 
@@ -29,6 +31,14 @@ export function CoffeeHeader() {
   const handleLogout = () => {
     signOut({ callbackUrl: "/" })
   }
+
+  const navLinkClass = (href: string) =>
+    `relative text-sm font-medium transition-colors
+   ${pathname === href ? "text-foreground" : "text-foreground/80 hover:text-foreground"}
+   after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full after:bg-primary
+   after:transition-transform after:duration-300
+   ${pathname === href ? "after:scale-x-100" : "after:scale-x-0"}`
+
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
@@ -54,8 +64,13 @@ export function CoffeeHeader() {
 
         <nav className="hidden md:flex items-center gap-8">
           <Link
+            href="/"
+            className={navLinkClass("/")}>
+            Dashboard
+          </Link>
+          <Link
             href="/products"
-            className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
+            className={navLinkClass("/products")}
           >
             Products
           </Link>
@@ -79,7 +94,7 @@ export function CoffeeHeader() {
           </button>
           <Link
             href="/about"
-            className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
+            className={navLinkClass("/about")}
           >
             About
           </Link>
@@ -239,6 +254,6 @@ export function CoffeeHeader() {
           </Sheet>
         </div>
       </div>
-    </header>
+    </header >
   )
 }

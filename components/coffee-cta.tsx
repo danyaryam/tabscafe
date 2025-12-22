@@ -2,15 +2,9 @@
 
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
+import Link from "next/link"
 
 export function CoffeeCta() {
-  const scrollToShop = () => {
-    const element = document.getElementById("shop")
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" })
-    }
-  }
-
   const scrollToStory = () => {
     const element = document.getElementById("story")
     if (element) {
@@ -31,10 +25,13 @@ export function CoffeeCta() {
               first order.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button onClick={scrollToShop} size="lg" variant="secondary" className="text-base">
-                Shop Now
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <Link href="/products">
+                <Button size="lg" variant="secondary" className="text-base">
+                  Shop Now
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+
               <Button
                 onClick={scrollToStory}
                 size="lg"

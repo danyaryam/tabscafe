@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/lib/cart-context"
 import { useToast } from "@/hooks/use-toast"
+import Link from "next/link"
 
 const products = [
   {
@@ -111,18 +112,11 @@ export function CoffeeProducts() {
         </div>
 
         <div className="text-center mt-12">
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => {
-              toast({
-                title: "Coming Soon",
-                description: "Full product catalog will be available soon!",
-              })
-            }}
-          >
-            View All Products
-          </Button>
+          <Link href="/products">
+            <Button variant="outline" size="lg">
+              View All Products
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

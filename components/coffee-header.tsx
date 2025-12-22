@@ -53,12 +53,12 @@ export function CoffeeHeader() {
         </div>
 
         <nav className="hidden md:flex items-center gap-8">
-          <button
-            onClick={() => scrollToSection("shop")}
+          <Link
+            href="/products"
             className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
           >
-            Shop
-          </button>
+            Products
+          </Link>
           <button
             onClick={() => scrollToSection("story")}
             className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"

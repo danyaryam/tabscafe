@@ -24,13 +24,20 @@ export function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-  
+
     const res = await signIn("credentials", {
       email: formData.email,
       password: formData.password,
       redirect: false,
     })
-  
+
+    if (res?.error === "EMAIL_NOT_VERIFIED") {
+      toast({
+        title: "Email not verified",
+        description: "Please check your email for verification link",
+        variant: "destructive",
+      })
+    }
     if (res?.error) {
       toast({
         title: "Invalid credentials",
@@ -45,7 +52,7 @@ export function LoginForm() {
       router.push("/")
       router.refresh()
     }
-  
+
     setIsLoading(false)
   }
 

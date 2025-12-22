@@ -22,38 +22,40 @@ export const { handlers, auth } = NextAuth({
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: {},
-        password: {},
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const email = credentials?.email as string | undefined
-        const password = credentials?.password as string | undefined
+        if (!credentials?.email || !credentials?.password) return null
       
-        if (!email || !password) return null
-      
-        const user = await pool.query(
-          "SELECT id, name, email, password, role FROM users WHERE email = $1",
-          [email]
+        const res = await pool.query(
+          "SELECT id, name, email, password, role, email_verified FROM users WHERE email = $1",
+          [credentials.email]
         )
+        const user = res.rows[0]
+        if (!user) return null
       
-        if (!user.rows[0]) return null
+        if (!user.email_verified) {
+          throw new Error("EMAIL_NOT_VERIFIED")
+        }
       
-        const isValid = await bcrypt.compare(
-          password,
-          user.rows[0].password
-        )
-      
+        if (!user.password || typeof user.password !== "string") return null
+        const password = credentials.password as string
+        if (!user.password) return null
+        const hashedPassword = String(user.password)
+        const isValid = await bcrypt.compare(password, hashedPassword)
+
         if (!isValid) return null
       
         return {
-          id: user.rows[0].id,
-          name: user.rows[0].name,
-          email: user.rows[0].email,
-          role: user.rows[0].role,
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
         }
       }
-    })
 
+    }),
   ],
 
   callbacks: {

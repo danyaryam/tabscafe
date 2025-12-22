@@ -206,27 +206,27 @@ export function CoffeeHeader() {
                   Contact
                 </button>
                 {isAdmin && (
-  <Link href="/admin/dashboard" className="w-full">
-    <Button
-      variant="outline"
-      className="w-full justify-start bg-transparent"
-    >
-      <Shield className="mr-2 h-4 w-4" />
-      Admin Dashboard
-    </Button>
-  </Link>
-)}
+                  <Link href="/admin/dashboard" className="w-full">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start bg-transparent"
+                    >
+                      <Shield className="mr-2 h-4 w-4" />
+                      Admin Dashboard
+                    </Button>
+                  </Link>
+                )}
 
-{isAuthenticated && (
-  <Button
-    onClick={() => signOut({ callbackUrl: "/" })}
-    variant="destructive"
-    className="mt-4 w-full"
-  >
-    <LogOut className="mr-2 h-4 w-4" />
-    Log Out
-  </Button>
-)}
+                {isAuthenticated && (
+                  <Button
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    variant="destructive"
+                    className="mt-4 w-full"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log Out
+                  </Button>
+                )}
 
               </nav>
             </SheetContent>

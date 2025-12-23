@@ -117,8 +117,8 @@ export function CoffeeHeader() {
               <DropdownMenuContent className="w-56" align="end">
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                    <p className="text-sm font-medium">{session?.user?.name}</p>
+                    <p className="text-xs text-muted-foreground">{session?.user?.email}</p>
                   </div>
                 </DropdownMenuLabel>
 
@@ -181,7 +181,7 @@ export function CoffeeHeader() {
                     <div className="flex items-center gap-3 pb-4 border-b">
                       <Avatar className="h-12 w-12">
                         <AvatarFallback className="bg-primary text-primary-foreground">
-                          {getUserInitials(user.name)}
+                          {getUserInitials(user.name ?? "User")}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col">

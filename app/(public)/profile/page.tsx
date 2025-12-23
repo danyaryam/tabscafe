@@ -32,7 +32,6 @@ import {
 
 import { useToast } from "@/hooks/use-toast"
 
-/* ================= TYPES ================= */
 
 interface Order {
   id: string
@@ -42,12 +41,11 @@ interface Order {
   items: number
 }
 
-/* ================= PAGE ================= */
 
 export default function ProfilePage() {
   const router = useRouter()
   const { toast } = useToast()
-  const { data: session, status } = useSession()
+  const { data: session, status, update } = useSession()
 
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
@@ -57,7 +55,6 @@ export default function ProfilePage() {
     address: "",
   })
 
-  /* ===== MOCK / API ORDER DATA (ganti ke API bila perlu) ===== */
   const orders: Order[] = [
     {
       id: "ORD-001",
@@ -75,21 +72,37 @@ export default function ProfilePage() {
     },
   ]
 
-  /* ===== PROTECT PAGE ===== */
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/login")
     }
 
-    if (session?.user) {
+    if (status === "authenticated") {
+      fetchProfile()
+    }
+  }, [status])
+
+  const fetchProfile = async () => {
+    try {
+      const res = await fetch("/api/profile")
+      if (!res.ok) throw new Error("Failed to load profile")
+
+      const data = await res.json()
+
       setFormData({
-        name: session.user.name ?? "",
-        email: session.user.email ?? "",
-        phone: "",
-        address: "",
+        name: data.name ?? "",
+        email: data.email ?? "",
+        phone: data.phone ?? "",
+        address: data.address ?? "",
+      })
+    } catch(error) {
+      toast({
+        title: "Error",
+        description: "Failed to load profile data",
+        variant: "destructive",
       })
     }
-  }, [status, session, router])
+  }
 
   if (status === "loading") {
     return (
@@ -101,18 +114,40 @@ export default function ProfilePage() {
 
   if (!session?.user) return null
 
-  /* ================= HANDLERS ================= */
-
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault()
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          address: formData.address,
+        }),
+      })
 
-    // TODO: panggil API update profile
-    toast({
-      title: "Profile updated",
-      description: "Your profile has been successfully updated.",
-    })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message)
 
-    setIsEditing(false)
+      await update({
+        name: formData.name,
+        email: formData.email,
+      })
+
+      toast({
+        title: "Profile updated",
+        description: data.message,
+      })
+      router.refresh()
+      setIsEditing(false)
+    } catch (error: any) {
+      toast({
+        title: "Update failed",
+        description: error.message,
+        variant: "destructive",
+      })
+    }
   }
 
   const getStatusIcon = (status: Order["status"]) => {

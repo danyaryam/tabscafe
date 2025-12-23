@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Providers } from "./providers"
 import "./globals.css"
 import { ScrollToTop } from "@/components/scroll-to-top"
+import { ThemeProvider } from "@/lib/theme-provider"
 
 const geist = Geist({ subsets: ["latin"] })
 
@@ -19,12 +20,15 @@ export default function RootLayout({
   return (
     <html lang="en" >
       <body className={`${geist.className} antialiased`}>
-        <Providers>
-          {children}
-        </Providers>
+        <ThemeProvider>
 
-        <ScrollToTop />
-        <Analytics />
+          <Providers>
+            {children}
+          </Providers>
+
+          <ScrollToTop />
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -47,7 +47,7 @@ export function PaymentButton({
       const orderId = `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
       // Request payment token from backend
-      const response = await fetch("/api/payment", {
+      const response = await fetch("/api/payments", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

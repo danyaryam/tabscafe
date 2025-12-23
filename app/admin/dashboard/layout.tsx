@@ -12,6 +12,7 @@ import {
   ShoppingCart,
   Users,
   BarChart3,
+  Megaphone,
   Settings,
   LogOut,
   Menu,
@@ -19,6 +20,7 @@ import {
   Coffee,
 } from "lucide-react"
 import Link from "next/link"
+import { BannerProvider } from "@/lib/banner-context"
 
 const navigation = [
   { name: "Overview", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -26,6 +28,7 @@ const navigation = [
   { name: "Orders", href: "/admin/dashboard/orders", icon: ShoppingCart },
   { name: "Customers", href: "/admin/dashboard/customers", icon: Users },
   { name: "Analytics", href: "/admin/dashboard/analytics", icon: BarChart3 },
+  { name: "Promotions", href: "/admin/dashboard/promotion", icon: Megaphone },
   { name: "Settings", href: "/admin/dashboard/settings", icon: Settings },
 ]
 
@@ -74,11 +77,10 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
                       ? "bg-primary text-primary-foreground"
                       : "text-neutral-400 hover:bg-neutral-800 hover:text-white"
-                  }`}
+                    }`}
                 >
                   <item.icon className="w-5 h-5" />
                   {item.name}
@@ -121,11 +123,10 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
                     key={item.name}
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                      isActive
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
                         ? "bg-primary text-primary-foreground"
                         : "text-neutral-400 hover:bg-neutral-800 hover:text-white"
-                    }`}
+                      }`}
                   >
                     <item.icon className="w-5 h-5" />
                     {item.name}
@@ -152,8 +153,10 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
           </Button>
           <h1 className="text-lg font-semibold text-white">Dashboard</h1>
         </div>
+        <BannerProvider>
 
-        <main className="p-4 lg:p-8">{children}</main>
+          <main className="p-4 lg:p-8">{children}</main>
+        </BannerProvider>
       </div>
     </div>
   )

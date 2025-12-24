@@ -45,11 +45,26 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(transactionData),
     });
 
+    console.log("MIDTRANS_ENVIRONMENT =", process.env.MIDTRANS_ENVIRONMENT);
+console.log("midtransUrl =", midtransUrl);
+console.log("serverKey prefix =", serverKey?.slice(0, 5));
+
+
     const data = await response.json();
 
     if (!response.ok) {
+      console.error("Midtrans API error:", {
+        status: response.status,
+        error: data.error_messages || data.message,
+        data,
+      });
       return NextResponse.json(
-        { error: data.error_messages || "Payment failed" },
+        { 
+          error: Array.isArray(data.error_messages) 
+            ? data.error_messages.join(", ") 
+            : data.error_messages || data.message || "Payment failed",
+          details: data
+        },
         { status: response.status }
       );
     }
@@ -61,9 +76,12 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Payment error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Internal server error";
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: errorMessage, details: String(error) },
       { status: 500 }
     );
   }
 }
+
+

@@ -1,87 +1,123 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server"
+
+export const runtime = "nodejs"
+
+type VABank = "bca" | "bni" | "bri" | "permata" | "cimb" | "mandiri"
+
+type PaymentMethod =
+  | { type: "va"; bank: VABank }
+  | { type: "qris"; acquirer?: "gopay" | "airpay_shopee" }
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { orderId, amount, customerDetails, items } = body;
-
-    // Midtrans Server Key from environment
-    const serverKey = process.env.MIDTRANS_SERVER_KEY;
-    const isProduction = process.env.MIDTRANS_ENVIRONMENT === "production";
-
-    if (!serverKey) {
-      return NextResponse.json(
-        { error: "Midtrans server key not configured" },
-        { status: 500 }
-      );
+    const body = await request.json()
+    const { orderId, amount, customerDetails, items, paymentMethod } = body as {
+      orderId: string
+      amount: number
+      customerDetails: any
+      items: Array<{ id: string; name: string; price: number; quantity: number }>
+      paymentMethod: PaymentMethod
     }
 
-    // Create authorization header (Base64 encoded server key)
-    const authString = Buffer.from(serverKey + ":").toString("base64");
+    const serverKey = process.env.MIDTRANS_SERVER_KEY
+    const isProduction = process.env.MIDTRANS_ENVIRONMENT === "production"
+    if (!serverKey) {
+      return NextResponse.json({ error: "Midtrans server key not configured" }, { status: 500 })
+    }
 
-    // Midtrans API endpoint
-    const midtransUrl = isProduction
-      ? "https://app.midtrans.com/snap/v1/transactions"
-      : "https://app.sandbox.midtrans.com/snap/v1/transactions";
+    // WAJIB: hitung ulang total di server biar tidak dimanipulasi
+    const computed = items.reduce((sum, it) => sum + it.price * it.quantity, 0)
+    if (computed !== amount) {
+      return NextResponse.json({ error: "Amount mismatch" }, { status: 400 })
+    }
 
-    // Prepare transaction data
-    const transactionData = {
-      transaction_details: {
-        order_id: orderId,
-        gross_amount: amount,
-      },
+    const authString = Buffer.from(serverKey + ":").toString("base64")
+    const apiHost = isProduction ? "https://api.midtrans.com" : "https://api.sandbox.midtrans.com"
+
+    const basePayload: any = {
+      transaction_details: { order_id: orderId, gross_amount: amount },
       customer_details: customerDetails,
       item_details: items,
-    };
+    }
 
-    // Make request to Midtrans
-    const response = await fetch(midtransUrl, {
+    let payload: any
+
+    if (paymentMethod.type === "va") {
+      if (paymentMethod.bank === "mandiri") {
+        payload = {
+          ...basePayload,
+          payment_type: "echannel",
+          echannel: {
+            bill_info1: "Payment",
+            bill_info2: `Order ${String(orderId).slice(0, 20)}`,
+            // bill_key optional 
+          },
+        }
+      } else {
+        payload = {
+          ...basePayload,
+          payment_type: "bank_transfer",
+          bank_transfer: { bank: paymentMethod.bank },
+        }
+      }
+    } else if (paymentMethod.type === "qris") {
+      payload = {
+        ...basePayload,
+        payment_type: "qris",
+        // acquirer opsional;
+        qris: paymentMethod.acquirer ? { acquirer: paymentMethod.acquirer } : undefined,
+      }
+    } else {
+      return NextResponse.json({ error: "Unsupported payment method" }, { status: 400 })
+    }
+
+    const res = await fetch(`${apiHost}/v2/charge`, {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
         Authorization: `Basic ${authString}`,
       },
-      body: JSON.stringify(transactionData),
-    });
+      body: JSON.stringify(payload),
+    })
 
-    console.log("MIDTRANS_ENVIRONMENT =", process.env.MIDTRANS_ENVIRONMENT);
-console.log("midtransUrl =", midtransUrl);
-console.log("serverKey prefix =", serverKey?.slice(0, 5));
+    const data = await res.json()
 
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("Midtrans API error:", {
-        status: response.status,
-        error: data.error_messages || data.message,
-        data,
-      });
+    if (!res.ok) {
       return NextResponse.json(
-        { 
-          error: Array.isArray(data.error_messages) 
-            ? data.error_messages.join(", ") 
-            : data.error_messages || data.message || "Payment failed",
-          details: data
-        },
-        { status: response.status }
-      );
+        { error: data?.error_messages?.join(", ") || data?.message || "Charge failed", details: data },
+        { status: res.status }
+      )
     }
 
-    // Return the transaction token
-    return NextResponse.json({
-      token: data.token,
-      redirect_url: data.redirect_url,
-    });
+    // Normalisasi response buat frontend
+    const out: any = {
+      order_id: data.order_id,
+      payment_type: data.payment_type,
+      transaction_status: data.transaction_status,
+    }
+
+    // bank transfer VA
+    if (Array.isArray(data.va_numbers) && data.va_numbers.length > 0) {
+      out.va = { bank: data.va_numbers[0].bank, va_number: data.va_numbers[0].va_number }
+    } else if (data.permata_va_number) {
+      out.va = { bank: "permata", va_number: data.permata_va_number }
+    }
+
+    // mandiri echannel
+    if (data.payment_type === "echannel" && data.bill_key && data.biller_code) {
+      out.mandiri = { bill_key: data.bill_key, biller_code: data.biller_code }
+    }
+
+    // qris -> ambil qr-code url dari actions
+    if (Array.isArray(data.actions)) {
+      const qr = data.actions.find((a: any) => String(a?.name || "").includes("qr-code"))
+      if (qr?.url) out.qr = { url: qr.url }
+    }
+
+    return NextResponse.json(out)
   } catch (error) {
-    console.error("Payment error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Internal server error";
-    return NextResponse.json(
-      { error: errorMessage, details: String(error) },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : "Internal server error"
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
-
-

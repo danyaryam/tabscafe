@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import type { CartItem } from "@/lib/midtrans"
 import { PaymentButton, type PaymentMethod, type ChargeResult } from "@/components/payment-button"
 import { PaymentResultDialog } from "@/components/payment-result-dialog"
+import { toast } from "@/hooks/use-toast"
 
 type VABank = "bca" | "bni" | "bri" | "permata" | "cimb" | "mandiri"
 
@@ -218,7 +219,7 @@ export function CheckoutDialog({ open, onOpenChange, items, onPaymentSuccess }: 
         onPaid={() => {
           setResultOpen(false)
           onPaymentSuccess?.()
-          alert("Payment successful! Thank you for your order.")
+          toast({ title: "Payment successful!" })
         }}
       />
     </>

@@ -11,8 +11,11 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { PaymentButton } from "@/components/payment-button"
 import type { CartItem } from "@/lib/midtrans"
+import { PaymentButton, type PaymentMethod, type ChargeResult } from "@/components/payment-button"
+import { PaymentResultDialog } from "@/components/payment-result-dialog"
+
+type VABank = "bca" | "bni" | "bri" | "permata" | "cimb" | "mandiri"
 
 interface CheckoutDialogProps {
   open: boolean
@@ -31,6 +34,7 @@ export function CheckoutDialog({ open, onOpenChange, items, onPaymentSuccess }: 
     address: "",
   })
 
+<<<<<<< HEAD
   useEffect(() => {
     if (!open) return
 
@@ -60,52 +64,139 @@ export function CheckoutDialog({ open, onOpenChange, items, onPaymentSuccess }: 
     fetchCustomer()
   }, [open])
 
+=======
+  // pilih metode
+  const [payType, setPayType] = useState<"va" | "qris">("va")
+  const [vaBank, setVaBank] = useState<VABank>("bca")
+
+  // dialog hasil pembayaran (terpisah)
+  const [resultOpen, setResultOpen] = useState(false)
+  const [chargeResult, setChargeResult] = useState<ChargeResult | null>(null)
+>>>>>>> eb381eb5e075665a353b4d71e1610d6f4f4c1bfc
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-
-  const handleSuccess = () => {
-    onOpenChange(false)
-    onPaymentSuccess?.()
-    alert("Payment successful! Thank you for your order.")
-  }
-
-  const handlePending = () => {
-    alert("Payment is pending. Please complete your payment.")
-  }
-
-  const handleError = () => {
-    alert("Payment failed. Please try again.")
-  }
-
   const isFormValid = customerDetails.first_name && customerDetails.email && customerDetails.phone
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Checkout</DialogTitle>
-          <DialogDescription>Enter your details to complete the purchase</DialogDescription>
-        </DialogHeader>
+  const paymentMethod: PaymentMethod =
+    payType === "qris" ? { type: "qris", acquirer: "gopay" } : { type: "va", bank: vaBank }
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <h3 className="font-semibold">Order Summary</h3>
-            <div className="space-y-1 text-sm">
-              {items.map((item) => (
-                <div key={item.id} className="flex justify-between">
-                  <span>
-                    {item.name} x {item.quantity}
-                  </span>
-                  <span>Rp {(item.price * item.quantity).toLocaleString()}</span>
+  return (
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Checkout</DialogTitle>
+            <DialogDescription>Enter your details to complete the purchase</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Summary */}
+            <div className="space-y-2">
+              <h3 className="font-semibold">Order Summary</h3>
+              <div className="space-y-1 text-sm">
+                {items.map((item) => (
+                  <div key={item.id} className="flex justify-between">
+                    <span>
+                      {item.name} x {item.quantity}
+                    </span>
+                    <span>Rp {(item.price * item.quantity).toLocaleString()}</span>
+                  </div>
+                ))}
+                <div className="flex justify-between font-semibold pt-2 border-t">
+                  <span>Total</span>
+                  <span>Rp {total.toLocaleString()}</span>
                 </div>
-              ))}
-              <div className="flex justify-between font-semibold pt-2 border-t">
-                <span>Total</span>
-                <span>Rp {total.toLocaleString()}</span>
+              </div>
+            </div>
+
+            {/* Payment method */}
+            <div className="space-y-2">
+              <h3 className="font-semibold">Payment Method</h3>
+
+              <div className="grid gap-3">
+                <div className="space-y-1">
+                  <Label>Type</Label>
+                  <select
+                    className="w-full h-10 rounded-md border bg-background px-3 text-sm"
+                    value={payType}
+                    onChange={(e) => setPayType(e.target.value as "va" | "qris")}
+                  >
+                    <option value="va">Virtual Account (Transfer Bank)</option>
+                    <option value="qris">QRIS</option>
+                  </select>
+                </div>
+
+                {payType === "va" ? (
+                  <div className="space-y-1">
+                    <Label>Bank</Label>
+                    <select
+                      className="w-full h-10 rounded-md border bg-background px-3 text-sm"
+                      value={vaBank}
+                      onChange={(e) => setVaBank(e.target.value as VABank)}
+                    >
+                      <option value="bca">BCA</option>
+                      <option value="bni">BNI</option>
+                      <option value="bri">BRI</option>
+                      <option value="permata">Permata</option>
+                      <option value="cimb">CIMB</option>
+                      <option value="mandiri">Mandiri (Bill Payment)</option>
+                    </select>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+
+            {/* Customer Details */}
+            <div className="space-y-3">
+              <h3 className="font-semibold">Customer Details</h3>
+              <div className="grid gap-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="first_name">First Name</Label>
+                    <Input
+                      id="first_name"
+                      value={customerDetails.first_name}
+                      onChange={(e) => setCustomerDetails({ ...customerDetails, first_name: e.target.value })}
+                      placeholder="John"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="last_name">Last Name</Label>
+                    <Input
+                      id="last_name"
+                      value={customerDetails.last_name}
+                      onChange={(e) => setCustomerDetails({ ...customerDetails, last_name: e.target.value })}
+                      placeholder="Doe"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={customerDetails.email}
+                    onChange={(e) => setCustomerDetails({ ...customerDetails, email: e.target.value })}
+                    placeholder="john@example.com"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={customerDetails.phone}
+                    onChange={(e) => setCustomerDetails({ ...customerDetails, phone: e.target.value })}
+                    placeholder="+62812345678"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
+<<<<<<< HEAD
           <div className="space-y-3">
             <h3 className="font-semibold">Customer Details</h3>
             <div className="grid gap-3">
@@ -152,19 +243,37 @@ export function CheckoutDialog({ open, onOpenChange, items, onPaymentSuccess }: 
             </div>
           </div>
         </div>
+=======
+          <DialogFooter>
+            <PaymentButton
+              items={items}
+              customerDetails={customerDetails}
+              paymentMethod={paymentMethod}
+              disabled={!isFormValid}
+              className="w-full"
+              onCreated={(res) => {
+                // tutup checkout dialog, buka dialog hasil
+                setChargeResult(res)
+                onOpenChange(false)
+                setResultOpen(true)
+              }}
+            />
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+>>>>>>> eb381eb5e075665a353b4d71e1610d6f4f4c1bfc
 
-        <DialogFooter>
-          <PaymentButton
-            items={items}
-            customerDetails={customerDetails}
-            onSuccess={handleSuccess}
-            onPending={handlePending}
-            onError={handleError}
-            disabled={!isFormValid}
-            className="w-full"
-          />
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      {/* Dialog hasil bayar (terpisah) */}
+      <PaymentResultDialog
+        open={resultOpen}
+        onOpenChange={setResultOpen}
+        initialResult={chargeResult}
+        onPaid={() => {
+          setResultOpen(false)
+          onPaymentSuccess?.()
+          alert("Payment successful! Thank you for your order.")
+        }}
+      />
+    </>
   )
 }

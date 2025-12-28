@@ -30,7 +30,6 @@ export function CheckoutDialog({ open, onOpenChange, items, onPaymentSuccess }: 
     first_name: "",
     phone: "",
     email: "",
-    phone: "",
     address: "",
   })
 
@@ -52,7 +51,6 @@ export function CheckoutDialog({ open, onOpenChange, items, onPaymentSuccess }: 
           first_name,
           phone: last_name,
           email: data.email ?? "",
-          phone: data.phone ?? "",
           address: data.address ?? "",
         })
       } catch (error) {
@@ -179,16 +177,7 @@ export function CheckoutDialog({ open, onOpenChange, items, onPaymentSuccess }: 
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={customerDetails.phone}
-                    onChange={(e) => setCustomerDetails({ ...customerDetails, phone: e.target.value })}
-                    placeholder="+62812345678"
-                  />
-                </div>
+                
               </div>
             </div>
           </div>

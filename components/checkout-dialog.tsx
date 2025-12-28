@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -24,47 +24,14 @@ interface CheckoutDialogProps {
   onPaymentSuccess?: () => void
 }
 
-
 export function CheckoutDialog({ open, onOpenChange, items, onPaymentSuccess }: CheckoutDialogProps) {
   const [customerDetails, setCustomerDetails] = useState({
     first_name: "",
-    phone: "",
+    last_name: "",
     email: "",
     phone: "",
-    address: "",
   })
 
-<<<<<<< HEAD
-  useEffect(() => {
-    if (!open) return
-
-    const fetchCustomer = async () => {
-      try {
-        const res = await fetch("/api/profile")
-        if (!res.ok) return
-
-        const data = await res.json()
-
-        const fullName = data.name ?? ""
-        const [first_name = "", ...rest] = fullName.split(" ")
-        const last_name = rest.join(" ")
-
-        setCustomerDetails({
-          first_name,
-          phone: last_name,
-          email: data.email ?? "",
-          phone: data.phone ?? "",
-          address: data.address ?? "",
-        })
-      } catch (error) {
-        console.error("Failed to load customer data")
-      }
-    }
-
-    fetchCustomer()
-  }, [open])
-
-=======
   // pilih metode
   const [payType, setPayType] = useState<"va" | "qris">("va")
   const [vaBank, setVaBank] = useState<VABank>("bca")
@@ -72,7 +39,6 @@ export function CheckoutDialog({ open, onOpenChange, items, onPaymentSuccess }: 
   // dialog hasil pembayaran (terpisah)
   const [resultOpen, setResultOpen] = useState(false)
   const [chargeResult, setChargeResult] = useState<ChargeResult | null>(null)
->>>>>>> eb381eb5e075665a353b4d71e1610d6f4f4c1bfc
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const isFormValid = customerDetails.first_name && customerDetails.email && customerDetails.phone
@@ -196,54 +162,6 @@ export function CheckoutDialog({ open, onOpenChange, items, onPaymentSuccess }: 
             </div>
           </div>
 
-<<<<<<< HEAD
-          <div className="space-y-3">
-            <h3 className="font-semibold">Customer Details</h3>
-            <div className="grid gap-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label htmlFor="first_name">First Name</Label>
-                  <Input
-                    id="first_name"
-                    value={customerDetails.first_name}
-                    onChange={(e) => setCustomerDetails({ ...customerDetails, first_name: e.target.value })}
-                    placeholder="John"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="Phone">Phone </Label>
-                  <Input
-                    id="last_name"
-                    value={customerDetails.phone}
-                    onChange={(e) => setCustomerDetails({ ...customerDetails, phone: e.target.value })}
-                    placeholder="+62 1235-7426-9861"
-                  />
-                </div>
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={customerDetails.email}
-                  onChange={(e) => setCustomerDetails({ ...customerDetails, email: e.target.value })}
-                  placeholder="john@example.com"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={customerDetails.phone}
-                  onChange={(e) => setCustomerDetails({ ...customerDetails, phone: e.target.value })}
-                  placeholder="+62812345678"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-=======
           <DialogFooter>
             <PaymentButton
               items={items}
@@ -261,7 +179,6 @@ export function CheckoutDialog({ open, onOpenChange, items, onPaymentSuccess }: 
           </DialogFooter>
         </DialogContent>
       </Dialog>
->>>>>>> eb381eb5e075665a353b4d71e1610d6f4f4c1bfc
 
       {/* Dialog hasil bayar (terpisah) */}
       <PaymentResultDialog

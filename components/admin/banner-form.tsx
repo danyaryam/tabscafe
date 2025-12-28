@@ -130,7 +130,7 @@ export function BannerForm() {
               type="datetime-local"
               value={formData.eventDate}
               onChange={(e) => setFormData((prev) => ({ ...prev, eventDate: e.target.value }))}
-              className="mt-1 text-white"
+              className="mt-1 text-white "
             />
           </div>
 

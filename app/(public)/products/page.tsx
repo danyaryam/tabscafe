@@ -5,10 +5,10 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/lib/cart-context"
 import { useToast } from "@/hooks/use-toast"
-import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Coffee, Utensils, Package, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react"
+import { useEffect, useState } from "react"
 
 const allProducts = [
   {
@@ -198,12 +198,16 @@ const allProducts = [
 
 const roastLevels = ["All", "Light", "Medium", "Medium-Dark", "Dark"]
 
-const categories = [
-  { id: "all", label: "All Products", icon: SlidersHorizontal },
-  { id: "beans", label: "Coffee Beans", icon: Package },
-  { id: "drinks", label: "Drinks", icon: Coffee },
-  { id: "food", label: "Food", icon: Utensils },
-]
+const iconMap: Record<string, any> = {
+  "coffe-beans": Package,
+  "coffee": Coffee,
+  "milk-based": Coffee,
+  "soda-based": Coffee,
+  "cocktail": Coffee,
+  "dessert": Utensils,
+  "snack": Utensils,
+  "main-course": Utensils,
+}
 
 const priceRanges = [
   { id: "all", label: "All Prices", min: 0, max: Number.POSITIVE_INFINITY },
@@ -224,6 +228,25 @@ export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const productsPerPage = 12
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loadingCategories, setLoadingCategories] = useState(true)
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/categories")
+        const data = await res.json()
+        setCategories(data)
+      } catch (error) {
+        console.error("Failed to fetch categories", error)
+      } finally {
+        setLoadingCategories(false)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
 
   const filteredProducts = allProducts.filter((product) => {
     const roastMatch = selectedRoast === "All" || product.roast === selectedRoast
@@ -307,25 +330,39 @@ export default function ProductsPage() {
 
         {/* Category Filter & Search */}
         <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Category</h3>
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+              Category
+            </h3>
+
             <div className="flex flex-wrap gap-3">
-              {categories.map((category) => {
-                const Icon = category.icon
-                return (
-                  <Button
-                    key={category.id}
-                    variant={selectedCategory === category.id ? "default" : "outline"}
-                    onClick={() => setSelectedCategory(category.id)}
-                    className={selectedCategory === category.id ? "bg-primary text-primary-foreground" : "hover:bg-muted"}
-                  >
-                    <Icon className="mr-2 h-4 w-4" />
-                    {category.label}
-                  </Button>
-                )
-              })}
+              {/* ALL */}
+              <Button
+                variant={selectedCategory === "all" ? "default" : "outline"}
+                onClick={() => setSelectedCategory("all")}
+              >
+                <SlidersHorizontal className="mr-2 h-4 w-4" />
+                All Products
+              </Button>
+
+              {!loadingCategories &&
+                categories.map((category) => {
+                  const Icon = iconMap[category.slug] ?? Package
+
+                  return (
+                    <Button
+                      key={category.id}
+                      variant={selectedCategory === category.slug ? "default" : "outline"}
+                      onClick={() => setSelectedCategory(category.slug)}
+                    >
+                      <Icon className="mr-2 h-4 w-4" />
+                      {category.name}
+                    </Button>
+                  )
+                })}
             </div>
           </div>
+
 
           <div className="w-full lg:w-72">
             <Label className="text-sm font-semibold text-muted-foreground mb-2 block">

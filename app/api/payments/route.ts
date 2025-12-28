@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
 
     // Midtrans Server Key from environment
     const serverKey = process.env.MIDTRANS_SERVER_KEY;
-    const isProduction = process.env.MIDTRANS_ENVIRONMENT === "production";
+    const isProduction = process.env.MIDTRANS_ENVIRONMENT === "sendbox";
 
     if (!serverKey) {
       return NextResponse.json(

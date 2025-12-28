@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -21,13 +21,45 @@ interface CheckoutDialogProps {
   onPaymentSuccess?: () => void
 }
 
+
 export function CheckoutDialog({ open, onOpenChange, items, onPaymentSuccess }: CheckoutDialogProps) {
   const [customerDetails, setCustomerDetails] = useState({
     first_name: "",
-    last_name: "",
+    phone: "",
     email: "",
     phone: "",
+    address: "",
   })
+
+  useEffect(() => {
+    if (!open) return
+
+    const fetchCustomer = async () => {
+      try {
+        const res = await fetch("/api/profile")
+        if (!res.ok) return
+
+        const data = await res.json()
+
+        const fullName = data.name ?? ""
+        const [first_name = "", ...rest] = fullName.split(" ")
+        const last_name = rest.join(" ")
+
+        setCustomerDetails({
+          first_name,
+          phone: last_name,
+          email: data.email ?? "",
+          phone: data.phone ?? "",
+          address: data.address ?? "",
+        })
+      } catch (error) {
+        console.error("Failed to load customer data")
+      }
+    }
+
+    fetchCustomer()
+  }, [open])
+
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
@@ -88,12 +120,12 @@ export function CheckoutDialog({ open, onOpenChange, items, onPaymentSuccess }: 
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="last_name">Last Name</Label>
+                  <Label htmlFor="Phone">Phone </Label>
                   <Input
                     id="last_name"
-                    value={customerDetails.last_name}
-                    onChange={(e) => setCustomerDetails({ ...customerDetails, last_name: e.target.value })}
-                    placeholder="Doe"
+                    value={customerDetails.phone}
+                    onChange={(e) => setCustomerDetails({ ...customerDetails, phone: e.target.value })}
+                    placeholder="+62 1235-7426-9861"
                   />
                 </div>
               </div>

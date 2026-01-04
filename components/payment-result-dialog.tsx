@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import type { ChargeResult } from "@/components/payment-button"
+import { toast } from "@/hooks/use-toast"
 
 export function PaymentResultDialog({
   open,
@@ -64,7 +65,7 @@ export function PaymentResultDialog({
   const copy = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text)
-      alert("Copied!")
+      toast({ title: "Copied to clipboard" })
     } catch {
       // fallback
     }

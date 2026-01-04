@@ -10,20 +10,6 @@ type PaymentMethod =
 
 export async function POST(request: NextRequest) {
   try {
-<<<<<<< HEAD
-    const body = await request.json();
-    const { orderId, amount, customerDetails, items } = body;
-
-    // Midtrans Server Key from environment
-    const serverKey = process.env.MIDTRANS_SERVER_KEY;
-    const isProduction = process.env.MIDTRANS_ENVIRONMENT === "sendbox";
-
-    if (!serverKey) {
-      return NextResponse.json(
-        { error: "Midtrans server key not configured" },
-        { status: 500 }
-      );
-=======
     const body = await request.json()
     const { orderId, amount, customerDetails, items, paymentMethod } = body as {
       orderId: string
@@ -31,7 +17,6 @@ export async function POST(request: NextRequest) {
       customerDetails: any
       items: Array<{ id: string; name: string; price: number; quantity: number }>
       paymentMethod: PaymentMethod
->>>>>>> eb381eb5e075665a353b4d71e1610d6f4f4c1bfc
     }
 
     const serverKey = process.env.MIDTRANS_SERVER_KEY

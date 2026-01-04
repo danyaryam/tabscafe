@@ -1,10 +1,10 @@
 import type { Metadata } from "next"
 import { Geist } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
-import { Providers } from "./providers"
 import "./globals.css"
 import { ScrollToTop } from "@/components/scroll-to-top"
-import { ThemeProvider } from "@/lib/theme-provider"
+import { SessionProvider } from 'next-auth/react';
+import { ProductProvider } from "@/lib/product-context"
 
 const geist = Geist({ subsets: ["latin"] })
 
@@ -20,15 +20,14 @@ export default function RootLayout({
   return (
     <html lang="en" >
       <body className={`${geist.className} antialiased`}>
-        <ThemeProvider>
+        <SessionProvider>
+          <ProductProvider>
 
-          <Providers>
             {children}
-          </Providers>
-
-          <ScrollToTop />
-          <Analytics />
-        </ThemeProvider>
+            <ScrollToTop />
+            <Analytics />
+          </ProductProvider>
+        </SessionProvider>
       </body>
     </html>
   )

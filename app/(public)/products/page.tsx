@@ -9,194 +9,23 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Coffee, Utensils, Package, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react"
 import { useEffect, useState } from "react"
+import { useMemo } from "react"
 
-const allProducts = [
-  {
-    id: "eth-yirga",
-    name: "Ethiopia Yirgacheffe",
-    origin: "Ethiopia",
-    notes: "Floral, Citrus, Tea-like",
-    roast: "Light",
-    price: 89000,
-    image: "/ethiopian-coffee-beans-in-bag.jpg",
-    badge: "Bestseller",
-    description: "A delicate and complex coffee with vibrant floral and citrus notes. Perfect for pour-over brewing.",
-    category: "beans",
-  },
-  {
-    id: "col-supr",
-    name: "Colombia Supremo",
-    origin: "Colombia",
-    notes: "Chocolate, Caramel, Nuts",
-    roast: "Medium",
-    price: 79000,
-    image: "/colombian-coffee-beans-premium.jpg",
-    description: "Smooth and well-balanced with rich chocolate undertones. Great for espresso or drip coffee.",
-    category: "beans",
-  },
-  {
-    id: "bra-sant",
-    name: "Brazil Santos",
-    origin: "Brazil",
-    notes: "Sweet, Smooth, Low Acid",
-    roast: "Medium",
-    price: 75000,
-    image: "/brazilian-coffee-beans-roasted.jpg",
-    badge: "New",
-    description: "A crowd-pleaser with low acidity and natural sweetness. Ideal for everyday drinking.",
-    category: "beans",
-  },
-  {
-    id: "gua-anti",
-    name: "Guatemala Antigua",
-    origin: "Guatemala",
-    notes: "Cocoa, Spice, Balanced",
-    roast: "Medium-Dark",
-    price: 85000,
-    image: "/guatemalan-coffee-beans-volcanic.jpg",
-    description: "Grown in volcanic soil, this coffee offers deep cocoa flavors with a hint of spice.",
-    category: "beans",
-  },
-  {
-    id: "ken-aa",
-    name: "Kenya AA",
-    origin: "Kenya",
-    notes: "Blackcurrant, Wine-like, Bright",
-    roast: "Light-Medium",
-    price: 95000,
-    image: "/kenyan-coffee-beans.png",
-    badge: "Premium",
-    description: "Bold and fruity with wine-like acidity. A favorite among coffee enthusiasts.",
-    category: "beans",
-  },
-  {
-    id: "sum-mand",
-    name: "Sumatra Mandheling",
-    origin: "Indonesia",
-    notes: "Earthy, Herbal, Full-bodied",
-    roast: "Dark",
-    price: 82000,
-    image: "/sumatra-coffee-beans.png",
-    description: "Rich and complex with earthy notes. Perfect for French press brewing.",
-    category: "beans",
-  },
-  {
-    id: "cos-tara",
-    name: "Costa Rica Tarrazu",
-    origin: "Costa Rica",
-    notes: "Honey, Citrus, Clean",
-    roast: "Medium",
-    price: 87000,
-    image: "/costa-rican-coffee-beans.png",
-    description: "Crisp and clean with honey sweetness and bright citrus notes.",
-    category: "beans",
-  },
-  {
-    id: "per-org",
-    name: "Peru Organic",
-    origin: "Peru",
-    notes: "Nutty, Caramel, Mild",
-    roast: "Medium",
-    price: 78000,
-    image: "/peruvian-organic-coffee.jpg",
-    badge: "Organic",
-    description: "Certified organic with smooth, mild flavors. Great for any brewing method.",
-    category: "beans",
-  },
-  {
-    id: "latte-hot",
-    name: "Caffe Latte",
-    origin: "Italy",
-    notes: "Creamy, Smooth, Balanced",
-    roast: "Medium",
-    price: 35000,
-    image: "/caffe-latte-in-white-cup.jpg",
-    description: "Classic Italian coffee drink with espresso and steamed milk.",
-    category: "drinks",
-  },
-  {
-    id: "cappuccino",
-    name: "Cappuccino",
-    origin: "Italy",
-    notes: "Rich, Foamy, Bold",
-    roast: "Medium",
-    price: 38000,
-    image: "/cappuccino-with-foam-art.jpg",
-    badge: "Popular",
-    description: "Equal parts espresso, steamed milk, and foam. A coffee classic.",
-    category: "drinks",
-  },
-  {
-    id: "cold-brew",
-    name: "Cold Brew",
-    origin: "Modern",
-    notes: "Smooth, Sweet, Less Acidic",
-    roast: "Medium",
-    price: 42000,
-    image: "/cold-brew-coffee-with-ice.jpg",
-    description: "Slowly steeped for 12+ hours. Refreshingly smooth and naturally sweet.",
-    category: "drinks",
-  },
-  {
-    id: "affogato",
-    name: "Affogato",
-    origin: "Italy",
-    notes: "Sweet, Creamy, Dessert-like",
-    roast: "Dark",
-    price: 45000,
-    image: "/affogato-espresso-with-vanilla-ice-cream.jpg",
-    badge: "Signature",
-    description: "Hot espresso poured over vanilla ice cream. A delicious dessert treat.",
-    category: "drinks",
-  },
-  {
-    id: "croissant",
-    name: "Butter Croissant",
-    origin: "France",
-    notes: "Buttery, Flaky, Golden",
-    roast: "",
-    price: 25000,
-    image: "/golden-butter-croissant-pastry.jpg",
-    description: "Classic French pastry with layers of buttery goodness. Perfect with coffee.",
-    category: "food",
-  },
-  {
-    id: "tiramisu",
-    name: "Tiramisu",
-    origin: "Italy",
-    notes: "Coffee-soaked, Creamy, Rich",
-    roast: "",
-    price: 48000,
-    image: "/tiramisu-dessert-slice.jpg",
-    badge: "Bestseller",
-    description: "Classic Italian dessert with layers of coffee-soaked ladyfingers and mascarpone.",
-    category: "food",
-  },
-  {
-    id: "brownie",
-    name: "Chocolate Brownie",
-    origin: "America",
-    notes: "Fudgy, Rich, Decadent",
-    roast: "",
-    price: 32000,
-    image: "/fudgy-chocolate-brownie-square.jpg",
-    description: "Dense and fudgy chocolate brownie. A perfect sweet treat.",
-    category: "food",
-  },
-  {
-    id: "sandwich",
-    name: "Chicken Pesto Sandwich",
-    origin: "Modern",
-    notes: "Savory, Fresh, Herby",
-    roast: "",
-    price: 52000,
-    image: "/chicken-pesto-sandwich-on-ciabatta.jpg",
-    description: "Grilled chicken with basil pesto, mozzarella, and tomatoes on ciabatta bread.",
-    category: "food",
-  },
-]
+interface Product {
+  id: string
+  name: string
+  slug: string
+  price: number
+  image: string | null
+  category_slug: string
+  category_name: string
+  roast: string | null
+  notes: string | null
+  origin: string | null
+  description: string | null
+}
 
-const roastLevels = ["All", "Light", "Medium", "Medium-Dark", "Dark"]
+
 
 const iconMap: Record<string, any> = {
   "coffe-beans": Package,
@@ -230,6 +59,8 @@ export default function ProductsPage() {
   const productsPerPage = 12
   const [categories, setCategories] = useState<Category[]>([])
   const [loadingCategories, setLoadingCategories] = useState(true)
+  const [products, setProducts] = useState<Product[]>([])
+  const [loadingProducts, setLoadingProducts] = useState(true)
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -247,12 +78,33 @@ export default function ProductsPage() {
     fetchCategories()
   }, [])
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch("/api/products")
+        if (!res.ok) throw new Error("Failed to fetch products")
+        const data = await res.json()
+        setProducts(data)
+      } catch (error) {
+        console.error("Failed to fetch products", error)
+      } finally {
+        setLoadingProducts(false)
+      }
+    }
 
-  const filteredProducts = allProducts.filter((product) => {
+    fetchProducts()
+  }, [])
+
+  const filteredProducts = products.filter((product) => {
     const roastMatch = selectedRoast === "All" || product.roast === selectedRoast
-    const categoryMatch = selectedCategory === "all" || product.category === selectedCategory
+    const categoryMatch =
+      selectedCategory === "all" || product.category_slug === selectedCategory
 
-    const searchMatch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || product.origin.toLowerCase().includes(searchQuery.toLowerCase()) || product.notes.toLowerCase().includes(searchQuery.toLowerCase()) || product.description.toLowerCase().includes(searchQuery.toLowerCase())
+    const searchMatch =
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.origin ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.notes ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.description ?? "").toLowerCase().includes(searchQuery.toLowerCase())
 
     let priceMatch = true
     if (useCustomPrice) {
@@ -266,6 +118,19 @@ export default function ProductsPage() {
 
     return roastMatch && categoryMatch && priceMatch && searchMatch
   })
+
+  const roastLevels = useMemo(() => {
+    const dynamicRoasts = Array.from(
+      new Set(
+        products
+          .map((p) => p.roast)
+          .filter((roast): roast is string => Boolean(roast))
+      )
+    )
+
+    return ["All", ...dynamicRoasts]
+  }, [products])
+
 
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
   const startIndex = (currentPage - 1) * productsPerPage
@@ -286,7 +151,7 @@ export default function ProductsPage() {
     setCurrentPage(1)
   }
 
-  const handleAddToCart = (product: (typeof allProducts)[0]) => {
+  const handleAddToCart = (product: (typeof products)[0]) => {
     addItem({
       id: product.id,
       name: product.name,
@@ -443,31 +308,40 @@ export default function ProductsPage() {
             </div>
 
             {/* Roast Level Filter */}
-            {(selectedCategory === "all" || selectedCategory === "beans") && (
-              <div className="mb-12">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Roast Level</h3>
-                <div className="flex flex-wrap gap-2">
-                  {roastLevels.map((roast) => (
-                    <Button
-                      key={roast}
-                      variant={selectedRoast === roast ? "default" : "outline"}
-                      onClick={() => setSelectedRoast(roast)}
-                      className={selectedRoast === roast ? "bg-primary text-primary-foreground" : ""}
-                    >
-                      {roast}
-                    </Button>
-                  ))}
+            {(selectedCategory === "all" || selectedCategory === "beans") &&
+              roastLevels.length > 1 && (
+                <div className="mb-12">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+                    Roast Level
+                  </h3>
+
+                  <div className="flex flex-wrap gap-2">
+                    {roastLevels.map((roast) => (
+                      <Button
+                        key={roast}
+                        variant={selectedRoast === roast ? "default" : "outline"}
+                        onClick={() => {
+                          setSelectedRoast(roast)
+                          setCurrentPage(1)
+                        }}
+                      >
+                        {roast}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
 
           {/*produk*/}
           <div className="lg:col-span-9">
             <div className="mb-6">
               <p className="text-sm text-muted-foreground">
-                Showing <span className="font-semibold text-foreground">{filteredProducts.length}</span> product
-                {filteredProducts.length !== 1 ? "s" : ""}
+                Showing{" "}
+                <span className="font-semibold text-foreground">
+                  {filteredProducts.length}
+                </span>{" "}
+                product{filteredProducts.length !== 1 ? "s" : ""}
               </p>
             </div>
 
@@ -480,28 +354,51 @@ export default function ProductsPage() {
                   <CardHeader className="p-0">
                     <div className="aspect-square overflow-hidden bg-muted relative">
                       <img
-                        src={product.image || "/placeholder.svg"}
+                        src={product.image ?? "/placeholder.svg"}
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      {product.badge && (
-                        <Badge className="absolute top-3 right-3 bg-accent text-accent-foreground">{product.badge}</Badge>
-                      )}
+
+                      {/* Roast badge */}
                       {product.roast && (
-                        <Badge className="absolute bottom-3 left-3 bg-background/80 text-foreground">{product.roast}</Badge>
+                        <Badge className="absolute bottom-3 left-3 bg-background/80 text-foreground">
+                          {product.roast}
+                        </Badge>
                       )}
                     </div>
                   </CardHeader>
-                  <CardContent className="px-3 space-y-0.5">
-                    <div className="space-y-0.5">
-                      <h3 className="font-serif font-semibold text-lg">{product.name}</h3>
-                      <p className="text-sm text-muted-foreground">&quot;{product.origin}&quot;</p>
+
+                  <CardContent className="px-3 space-y-1">
+                    <div>
+                      <h3 className="font-serif font-semibold text-lg">
+                        {product.name}
+                      </h3>
+
+                      {product.origin && (
+                        <p className="text-sm text-muted-foreground">
+                          &quot;{product.origin}&quot;
+                        </p>
+                      )}
                     </div>
-                    <p className="text-sm text-foreground/70">{product.notes}</p>
-                    <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>
+
+                    {product.notes && (
+                      <p className="text-sm text-foreground/70">
+                        {product.notes}
+                      </p>
+                    )}
+
+                    {product.description && (
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        {product.description}
+                      </p>
+                    )}
                   </CardContent>
+
                   <CardFooter className="px-3 py-1 h-16 relative">
-                    <span className="top-0 absolute left-3 text-xl font-bold text-accent">Rp {product.price.toLocaleString()}</span>
+                    <span className="absolute left-3 top-0 text-xl font-bold text-accent">
+                      Rp {Number(product.price).toLocaleString("id-ID")}
+                    </span>
+
                     <Button
                       size="sm"
                       className="absolute right-3 bottom-0 bg-primary text-primary-foreground hover:bg-primary/90"

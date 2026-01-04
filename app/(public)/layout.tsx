@@ -1,33 +1,36 @@
-'use client'
+"use client"
 
-import { CoffeeFooter } from "@/components/coffee-footer"
-import { CoffeeHeader } from "@/components/coffee-header"
-import { PromotionalBanner } from "@/components/promotional-banner"
+import { Providers } from "../providers"
+import { ThemeProvider } from "@/lib/theme-provider"
 import { BannerProvider } from "@/lib/banner-context"
-import type { ReactNode } from "react"
+import { CoffeeHeader } from "@/components/coffee-header"
+import { CoffeeFooter } from "@/components/coffee-footer"
+import { PromotionalBanner } from "@/components/promotional-banner"
 import { useMemo } from "react"
 
-export default function PublicLayout({ children }: { children: ReactNode }) {
+export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const eventDate = useMemo(() => {
-    const date = new Date()
-    date.setDate(date.getDate() + 7)
-    return date
+    const d = new Date()
+    d.setDate(d.getDate() + 7)
+    return d
   }, [])
 
   return (
-    <BannerProvider>
-      <PromotionalBanner
-        message="Grand Opening Week! Get 25% off on all orders over Rp 100,000"
-        eventDate={eventDate}
-        autoHideAfter={300}
-        backgroundColor="bg-accent"
-      />
+    <ThemeProvider>
+      <Providers>
+        <BannerProvider>
+          <PromotionalBanner
+            message="Grand Opening Week! Get 25% off on all orders over Rp 100,000"
+            eventDate={eventDate}
+            autoHideAfter={1000}
+            backgroundColor="bg-accent"
+          />
 
-      <CoffeeHeader />
-
-      <main>{children}</main>
-
-      <CoffeeFooter />
-    </BannerProvider>
+          <CoffeeHeader />
+          <main>{children}</main>
+          <CoffeeFooter />
+        </BannerProvider>
+      </Providers>
+    </ThemeProvider>
   )
 }

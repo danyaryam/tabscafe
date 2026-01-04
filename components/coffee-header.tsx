@@ -33,6 +33,8 @@ export function CoffeeHeader() {
     signOut({ callbackUrl: "/" })
   }
 
+  if (status === "loading") return null
+
   const navLinkClass = (href: string) =>
     `relative text-sm font-medium transition-colors
    ${pathname === href ? "text-foreground" : "text-foreground/80 hover:text-foreground"}
@@ -102,7 +104,7 @@ export function CoffeeHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
-        <ThemeToggle />
+          <ThemeToggle />
           <CartSheet />
           {isAuthenticated && user ? (
             <DropdownMenu>

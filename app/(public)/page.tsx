@@ -6,6 +6,7 @@ import { CoffeeStory } from "@/components/coffee-story"
 import { CoffeeTestimonials } from "@/components/coffee-testimonials"
 import { CoffeeSubscription } from "@/components/coffee-subscription"
 import { CoffeeCta } from "@/components/coffee-cta"
+import { RecentlyViewedProducts } from "@/components/recently-viewed-products"
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
 
       <main>
         <CoffeeHero />
+        <RecentlyViewedProducts  />
         <CoffeeProducts />
         <CoffeeStory />
         <CoffeeTestimonials />

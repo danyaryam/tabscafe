@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Coffee, Utensils, Package, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useMemo } from "react"
+import { useProductDetailContext } from '@/lib/product-detail-context';
 
 interface Product {
   id: string
@@ -48,6 +49,7 @@ const priceRanges = [
 export default function ProductsPage() {
   const { addItem } = useCart()
   const { toast } = useToast()
+  const { openProduct } = useProductDetailContext()
   const [selectedRoast, setSelectedRoast] = useState("All")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedPriceRange, setSelectedPriceRange] = useState("all")
@@ -350,6 +352,7 @@ export default function ProductsPage() {
                 <Card
                   key={product.id}
                   className="group overflow-hidden border-border hover:shadow-lg transition-shadow duration-300"
+                  onClick={() => openProduct(product)}
                 >
                   <CardHeader className="p-0">
                     <div className="aspect-square overflow-hidden bg-muted relative">
@@ -402,7 +405,10 @@ export default function ProductsPage() {
                     <Button
                       size="sm"
                       className="absolute right-3 bottom-0 bg-primary text-primary-foreground hover:bg-primary/90"
-                      onClick={() => handleAddToCart(product)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleAddToCart(product)
+                      }}
                     >
                       Add to Cart
                     </Button>

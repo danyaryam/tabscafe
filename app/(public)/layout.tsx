@@ -7,6 +7,9 @@ import { CoffeeHeader } from "@/components/coffee-header"
 import { CoffeeFooter } from "@/components/coffee-footer"
 import { PromotionalBanner } from "@/components/promotional-banner"
 import { useMemo } from "react"
+// import { RecentlyViewedProvider } from "@/lib/recently-viewed-context"
+import { ProductDetailModal } from "@/components/product-detail-modal"
+import { ProductDetailProvider } from "@/lib/product-detail-context"
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const eventDate = useMemo(() => {
@@ -27,7 +30,12 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           />
 
           <CoffeeHeader />
-          <main>{children}</main>
+          
+            <ProductDetailProvider>
+              <main>{children}</main>
+              <ProductDetailModal />
+            </ProductDetailProvider>
+         
           <CoffeeFooter />
         </BannerProvider>
       </Providers>

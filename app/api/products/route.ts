@@ -15,6 +15,7 @@ export async function GET(request: Request) {
         p.image,
         p.roast,
         p.notes,
+        p.badge,
         p.origin,
         p.description,
         c.name AS category_name,

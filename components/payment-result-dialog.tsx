@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import type { ChargeResult } from "@/components/payment-button"
 import { toast } from "@/hooks/use-toast"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 
 export function PaymentResultDialog({
   open,
@@ -74,6 +75,11 @@ export function PaymentResultDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[520px]">
+        {/* Accessibility guarantee */}
+        <VisuallyHidden>
+          <DialogTitle>Payment Instructions</DialogTitle>
+        </VisuallyHidden>
+
         <DialogHeader>
           <DialogTitle>Payment Instructions</DialogTitle>
           <DialogDescription>

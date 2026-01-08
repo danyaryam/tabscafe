@@ -1,57 +1,97 @@
-// Authentication utilities for Cafe Tabs
-// This is a simple localStorage-based auth system
-// Can be easily upgraded to use a real database (Supabase, Neon, etc.)
-"use client"
+import NextAuth from "next-auth";
+import Google from "next-auth/providers/google";
+import GitHub from "next-auth/providers/github";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
+import { pool } from "@/lib/db";
 
-export interface User {
-  id: string
-  name: string
-  email: string
-}
+export const { auth, handlers } = NextAuth({
+  session: {
+    strategy: "jwt",
+    maxAge: 60 * 60 * 24,
+  },
+  jwt: {
+    maxAge: 60 * 60 * 24,
+  },
 
-export interface Session {
-  user: User
-  loggedIn: boolean
-}
+  providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    GitHub({
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    }),
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
 
-// Check if user is logged in
-export function isLoggedIn(): boolean {
-  if (typeof window === "undefined") return false
-  const session = localStorage.getItem("cafe_tabs_session")
-  if (!session) return false
-  try {
-    const parsed = JSON.parse(session)
-    return parsed.loggedIn === true
-  } catch {
-    return false
-  }
-}
+        const res = await pool.query(
+          `SELECT id, name, email, password, role, email_verified
+           FROM users
+           WHERE email = $1`,
+          [credentials.email]
+        );
 
-// Get current user
-export function getCurrentUser(): User | null {
-  if (typeof window === "undefined") return null
-  const session = localStorage.getItem("cafe_tabs_session")
-  if (!session) return null
-  try {
-    const parsed: Session = JSON.parse(session)
-    return parsed.user || null
-  } catch {
-    return null
-  }
-}
+        const user = res.rows[0];
+        if (!user) return null;
 
-// Logout user
-export function logout() {
-  if (typeof window === "undefined") return
-  localStorage.removeItem("cafe_tabs_session")
-}
+        if (!user.email_verified) {
+          throw new Error("EMAIL_NOT_VERIFIED");
+        }
 
-// Get user initials for avatar
-export function getUserInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2)
-}
+        const isValid = await bcrypt.compare(
+          credentials.password,
+          String(user.password)
+        );
+
+        if (!isValid) return null;
+
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        };
+      },
+    }),
+  ],
+
+  callbacks: {
+    async jwt({ token, user, trigger, session }) {
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.role = (user as any).role;
+      }
+
+      if (trigger === "update" && session) {
+        if (session.name) token.name = session.name;
+        if (session.email) token.email = session.email;
+      }
+
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.name = token.name as string;
+        session.user.email = token.email as string;
+        session.user.role = token.role as string;
+      }
+      return session;
+    },
+  },
+
+  pages: {
+    signIn: "/login",
+  },
+});

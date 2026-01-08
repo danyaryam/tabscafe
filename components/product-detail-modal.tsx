@@ -1,7 +1,7 @@
 "use client"
 
 import { useProductDetailContext } from "@/lib/product-detail-context"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/lib/cart-context"
@@ -11,6 +11,7 @@ import { useRecentlyViewed } from "@/lib/recently-viewed-context"
 import { useState } from "react"
 import { useEffect } from "react"
 import { useSession } from "next-auth/react"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 
 export function ProductDetailModal() {
   const { selectedProduct, isOpen, closeProduct } = useProductDetailContext()
@@ -67,6 +68,9 @@ export function ProductDetailModal() {
   return (
     <Dialog open={isOpen} onOpenChange={closeProduct}>
       <DialogContent className="!max-w-3xl overflow-y-auto max-h-[90vh]">
+        <VisuallyHidden>
+          <DialogTitle>Product Detail</DialogTitle> 
+        </VisuallyHidden>
         <div className="grid md:grid-cols-2 gap-6">
           {/* Product Image */}
           <div className="flex items-center justify-center bg-muted rounded-lg overflow-hidden">

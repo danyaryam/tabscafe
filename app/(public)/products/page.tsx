@@ -24,12 +24,11 @@ interface Product {
   category_slug: string
   category_name: string
   roast: string | null
+  badge: string | null
   notes: string | null
   origin: string | null
   description: string | null
 }
-
-
 
 const iconMap: Record<string, any> = {
   "coffe-beans": Package,
@@ -395,6 +394,11 @@ export default function ProductsPage() {
                             />
 
                             {/* Roast badge */}
+                            {product.badge && (
+                              <Badge className="absolute top-3 right-3 bg-accent text-accent-foreground">
+                                {product.badge}
+                              </Badge>
+                            )}
                             {product.roast && (
                               <Badge className="absolute bottom-3 left-3 bg-background/80 text-foreground">
                                 {product.roast}

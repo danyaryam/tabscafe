@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { getUserInitials } from "@/lib/auth"
+import { getUserInitials } from "@/lib/user-utils"
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
 import { usePathname } from "next/navigation"

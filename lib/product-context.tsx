@@ -16,6 +16,7 @@ export interface Product {
   notes?: string
   origin?: string
   roast?: RoastType | null
+  badge: string
   created_at: string
   updated_at?: string
 }

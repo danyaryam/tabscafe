@@ -26,6 +26,10 @@ type CategoryInput = Omit<Category, "id" | "createdAt">
 interface CategoryContextType {
   categories: Category[]
   loading: boolean
+
+  selectedCategory: string
+  setSelectedCategory: (slug: string) => void
+
   addCategory: (data: CategoryInput) => Promise<void>
   updateCategory: (id: string, data: CategoryInput) => Promise<void>
   deleteCategory: (id: string) => Promise<void>
@@ -40,6 +44,7 @@ const CategoryContext = createContext<CategoryContextType | undefined>(undefined
 export function CategoryProvider({ children }: { children: ReactNode }) {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedCategory, setSelectedCategory] = useState("all")
 
   const fetchCategories = async () => {
     setLoading(true)
@@ -96,6 +101,8 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
       value={{
         categories,
         loading,
+        selectedCategory,
+        setSelectedCategory,
         addCategory,
         updateCategory,
         deleteCategory,

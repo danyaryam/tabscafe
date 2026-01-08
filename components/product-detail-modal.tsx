@@ -90,24 +90,6 @@ export function ProductDetailModal() {
                 <p className="text-lg text-muted-foreground mt-1">{selectedProduct.origin}</p>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-5 w-5 ${i < Math.floor(selectedProduct.rating)
-                        ? "fill-yellow-400 text-yellow-400"
-                        : i < selectedProduct.rating
-                          ? "fill-yellow-400/50 text-yellow-400"
-                          : "fill-muted text-muted"
-                        }`}
-                    />
-                  ))}
-                </div>
-                <span className="text-lg font-semibold">{selectedProduct.rating}</span>
-                <span className="text-muted-foreground">({selectedProduct.reviewCount} reviews)</span>
-              </div>
-
               <div>
                 <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider mb-2">
                   Tasting Notes
@@ -122,7 +104,7 @@ export function ProductDetailModal() {
                 <p className="text-base text-foreground/80 leading-relaxed">{selectedProduct.description}</p>
               </div>
 
-              <div className="pt-4 border-t border-border">
+              <div className="py-4 border-t border-border">
                 <span className="text-3xl font-bold text-accent">Rp {selectedProduct.price.toLocaleString()}</span>
               </div>
             </div>

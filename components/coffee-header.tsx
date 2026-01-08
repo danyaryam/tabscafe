@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Menu, LogOut, ShoppingBag, Shield, User } from "lucide-react"
+import { Menu, LogOut, ShoppingBag, Shield, User, ChevronDown } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { CartSheet } from "@/components/cart-sheet"
 import { useState } from "react"
@@ -18,12 +18,17 @@ import { getUserInitials } from "@/lib/auth"
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
 import { usePathname } from "next/navigation"
-import { ThemeToggle } from './theme-toggle';
+import { ThemeToggle } from './theme-toggle'
+import { useCategories } from "@/lib/category-context"
+import { useRouter } from "next/navigation"
 
 export function CoffeeHeader() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { data: session, status } = useSession()
+
+  const { categories } = useCategories()
+  const router = useRouter()
 
   const user = session?.user
   const isAuthenticated = status === "authenticated"
@@ -41,6 +46,10 @@ export function CoffeeHeader() {
    after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full after:bg-primary
    after:transition-transform after:duration-300
    ${pathname === href ? "after:scale-x-100" : "after:scale-x-0"}`
+
+  const handleCategoryFilter = (slug: string) => {
+    router.push(`/products?category=${slug}`)
+  }
 
 
   const scrollToSection = (sectionId: string) => {
@@ -71,6 +80,31 @@ export function CoffeeHeader() {
             className={navLinkClass("/")}>
             Dashboard
           </Link>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div
+                className="flex items-center gap-2 cursor-pointer select-none text-sm font-medium hover:text-primary"
+              >
+                Categories
+                <ChevronDown className="h-4 w-4" />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 mt-2" align="start">
+              <DropdownMenuItem onClick={() => handleCategoryFilter("all")}>
+                All Products
+              </DropdownMenuItem>
+              {categories.map((category) => (
+                <DropdownMenuItem
+                  key={category.id}
+                  onClick={() => handleCategoryFilter(category.slug)}
+                >
+                  {category.name}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Link
             href="/products"
             className={navLinkClass("/products")}

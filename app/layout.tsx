@@ -22,7 +22,6 @@ export default function RootLayout({
       <body className={`${geist.className} antialiased`}>
         <SessionProvider>
           <ProductProvider>
-
             {children}
             <ScrollToTop />
             <Analytics />

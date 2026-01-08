@@ -11,6 +11,9 @@ import { Coffee, Utensils, Package, SlidersHorizontal, ChevronLeft, ChevronRight
 import { useEffect, useState } from "react"
 import { useMemo } from "react"
 import { useProductDetailContext } from '@/lib/product-detail-context';
+import { LayoutGrid, List } from "lucide-react"
+import { useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 
 interface Product {
   id: string
@@ -61,8 +64,12 @@ export default function ProductsPage() {
   const productsPerPage = 12
   const [categories, setCategories] = useState<Category[]>([])
   const [loadingCategories, setLoadingCategories] = useState(true)
+  const searchParams = useSearchParams()
+  const categoryFromUrl = searchParams.get("category") ?? "all"
   const [products, setProducts] = useState<Product[]>([])
   const [loadingProducts, setLoadingProducts] = useState(true)
+  const [viewMode, setViewMode] = useState<"card" | "list">("card")
+  const router = useRouter()
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -96,6 +103,10 @@ export default function ProductsPage() {
 
     fetchProducts()
   }, [])
+
+  useEffect(() => {
+    setSelectedCategory(categoryFromUrl)
+  }, [categoryFromUrl])
 
   const filteredProducts = products.filter((product) => {
     const roastMatch = selectedRoast === "All" || product.roast === selectedRoast
@@ -132,7 +143,6 @@ export default function ProductsPage() {
 
     return ["All", ...dynamicRoasts]
   }, [products])
-
 
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
   const startIndex = (currentPage - 1) * productsPerPage
@@ -220,7 +230,7 @@ export default function ProductsPage() {
                     <Button
                       key={category.id}
                       variant={selectedCategory === category.slug ? "default" : "outline"}
-                      onClick={() => setSelectedCategory(category.slug)}
+                      onClick={() => { router.push(`/products?category=${category.slug}`) }}
                     >
                       <Icon className="mr-2 h-4 w-4" />
                       {category.name}
@@ -229,7 +239,6 @@ export default function ProductsPage() {
                 })}
             </div>
           </div>
-
 
           <div className="w-full lg:w-72">
             <Label className="text-sm font-semibold text-muted-foreground mb-2 block">
@@ -337,7 +346,7 @@ export default function ProductsPage() {
 
           {/*produk*/}
           <div className="lg:col-span-9">
-            <div className="mb-6">
+            <div className="mb-6 flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
                 Showing{" "}
                 <span className="font-semibold text-foreground">
@@ -345,76 +354,157 @@ export default function ProductsPage() {
                 </span>{" "}
                 product{filteredProducts.length !== 1 ? "s" : ""}
               </p>
+
+              <div className="flex gap-2">
+                <Button
+                  size="icon"
+                  variant={viewMode === "card" ? "default" : "outline"}
+                  onClick={() => setViewMode("card")}
+                  className="h-9 w-9"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </Button>
+
+                <Button
+                  size="icon"
+                  variant={viewMode === "list" ? "default" : "outline"}
+                  onClick={() => setViewMode("list")}
+                  className="h-9 w-9"
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {currentProducts.map((product) => (
-                <Card
-                  key={product.id}
-                  className="group overflow-hidden border-border hover:shadow-lg transition-shadow duration-300"
-                  onClick={() => openProduct(product)}
-                >
-                  <CardHeader className="p-0">
-                    <div className="aspect-square overflow-hidden bg-muted relative">
-                      <img
-                        src={product.image ?? "/placeholder.svg"}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+            <div className="md:col-span-3">
+              {
+                viewMode === "card" ? (
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {currentProducts.map((product) => (
+                      <Card
+                        key={product.id}
+                        className="group overflow-hidden border-border hover:shadow-lg transition-shadow duration-300"
+                        onClick={() => openProduct(product)}
+                      >
+                        <CardHeader className="p-0">
+                          <div className="aspect-square overflow-hidden bg-muted relative">
+                            <img
+                              src={product.image ?? "/placeholder.svg"}
+                              alt={product.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
 
-                      {/* Roast badge */}
-                      {product.roast && (
-                        <Badge className="absolute bottom-3 left-3 bg-background/80 text-foreground">
-                          {product.roast}
-                        </Badge>
-                      )}
-                    </div>
-                  </CardHeader>
+                            {/* Roast badge */}
+                            {product.roast && (
+                              <Badge className="absolute bottom-3 left-3 bg-background/80 text-foreground">
+                                {product.roast}
+                              </Badge>
+                            )}
+                          </div>
+                        </CardHeader>
 
-                  <CardContent className="px-3 space-y-1">
-                    <div>
-                      <h3 className="font-serif font-semibold text-lg">
-                        {product.name}
-                      </h3>
+                        <CardContent className="px-3 space-y-1">
+                          <div>
+                            <h3 className="font-serif font-semibold text-lg">
+                              {product.name}
+                            </h3>
 
-                      {product.origin && (
-                        <p className="text-sm text-muted-foreground">
-                          &quot;{product.origin}&quot;
-                        </p>
-                      )}
-                    </div>
+                            {product.origin && (
+                              <p className="text-sm text-muted-foreground">
+                                &quot;{product.origin}&quot;
+                              </p>
+                            )}
+                          </div>
 
-                    {product.notes && (
-                      <p className="text-sm text-foreground/70">
-                        {product.notes}
-                      </p>
-                    )}
+                          {product.notes && (
+                            <p className="text-sm text-foreground/70">
+                              {product.notes}
+                            </p>
+                          )}
 
-                    {product.description && (
-                      <p className="text-xs text-muted-foreground line-clamp-2">
-                        {product.description}
-                      </p>
-                    )}
-                  </CardContent>
+                          {product.description && (
+                            <p className="text-xs text-muted-foreground line-clamp-2">
+                              {product.description}
+                            </p>
+                          )}
+                        </CardContent>
 
-                  <CardFooter className="px-3 py-1 h-16 relative">
-                    <span className="absolute left-3 top-0 text-xl font-bold text-accent">
-                      Rp {Number(product.price).toLocaleString("id-ID")}
-                    </span>
+                        <CardFooter className="px-3 py-1 h-16 relative">
+                          <span className="absolute left-3 top-0 text-xl font-bold text-accent">
+                            Rp {Number(product.price).toLocaleString("id-ID")}
+                          </span>
 
-                    <Button
-                      size="sm"
-                      className="absolute right-3 bottom-0 bg-primary text-primary-foreground hover:bg-primary/90"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleAddToCart(product)
-                      }}
-                    >
-                      Add to Cart
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
+                          <Button
+                            size="sm"
+                            className="absolute right-3 bottom-0 bg-primary text-primary-foreground hover:bg-primary/90"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleAddToCart(product)
+                            }}
+                          >
+                            Add to Cart
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {currentProducts.map((product) => (
+                      <div
+                        key={product.id}
+                        className="flex items-center gap-4 p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer group"
+                        onClick={() => openProduct(product)}
+                      >
+                        <div className="w-24 h-24 flex-shrink-0 bg-muted rounded-lg overflow-hidden">
+                          <img
+                            src={product.image || "/placeholder.svg"}
+                            alt={product.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="font-serif font-semibold text-lg">{product.name}</h3>
+                            {product.roast && (
+                              <Badge className="bg-accent text-accent-foreground text-xs">{product.roast}</Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2">{product.origin}</p>
+                          <div className="flex items-center gap-4 flex-wrap">
+                            {product.roast && (
+                              <Badge variant="outline" className="text-xs">
+                                {product.roast}
+                              </Badge>
+                            )}
+                            <p className="text-xs text-foreground/70">{product.notes}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 flex-shrink-0">
+                          <div className="text-right">
+                            <p className="text-lg font-bold text-accent">Rp {product.price.toLocaleString()}</p>
+                            <p className="text-xs text-muted-foreground">{product.category_slug}</p>
+                          </div>
+                          <Button
+                            size="sm"
+                            className="bg-primary text-primary-foreground hover:bg-primary/90"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              addItem({
+                                id: product.id,
+                                name: product.name,
+                                price: product.price,
+                              })
+                            }}
+                          >
+                            Add to Cart
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              }
             </div>
 
             {/* Pagination */}

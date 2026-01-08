@@ -30,12 +30,10 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           />
 
           <CoffeeHeader />
-          
             <ProductDetailProvider>
               <main>{children}</main>
               <ProductDetailModal />
             </ProductDetailProvider>
-         
           <CoffeeFooter />
         </BannerProvider>
       </Providers>

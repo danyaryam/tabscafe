@@ -31,9 +31,7 @@ export function CoffeeFooter() {
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               className="flex items-center gap-2 mb-4"
             >
-              <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center font-bold text-accent-foreground text-sm">
-                CT
-              </div>
+              <img src="/logo.png" alt="Cafe Tabs Logo" className="h-20 w-20 rounded-3xl" />
               <span className="text-xl font-serif font-semibold">Cafe Tabs</span>
             </button>
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">

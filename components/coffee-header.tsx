@@ -65,9 +65,11 @@ export function CoffeeHeader() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-2">
           <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center font-bold text-accent-foreground text-sm">
-              CT
-            </div>
+            <img
+              src="/logo.png"
+              alt="Cafe Tabs Logo"
+              className="h-8 w-8 sm:h-10 sm:w-10 object-contain rounded-3xl"
+            />
             <Link href="/" className="hidden sm:inline-block">
               <span className="text-xl font-serif font-semibold tracking-tight">Cafe Tabs</span>
             </Link>
@@ -111,18 +113,10 @@ export function CoffeeHeader() {
           >
             Products
           </Link>
-          <button
-            onClick={() => scrollToSection("story")}
-            className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
-          >
+          <Link href="/story"
+            className={navLinkClass("/story")}>
             Our Story
-          </button>
-          <button
-            onClick={() => scrollToSection("subscription")}
-            className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
-          >
-            Subscribe
-          </button>
+          </Link>
           <button
             onClick={() => scrollToSection("contact")}
             className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"

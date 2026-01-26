@@ -10,6 +10,7 @@ import { useMemo } from "react"
 // import { RecentlyViewedProvider } from "@/lib/recently-viewed-context"
 import { ProductDetailModal } from "@/components/product-detail-modal"
 import { ProductDetailProvider } from "@/lib/product-detail-context"
+import Ads from "@/components/ads"
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const eventDate = useMemo(() => {
@@ -22,6 +23,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     <ThemeProvider>
       <Providers>
         <BannerProvider>
+          <Ads />
           <PromotionalBanner
             message="Grand Opening Week! Get 25% off on all orders over Rp 100,000"
             eventDate={eventDate}
